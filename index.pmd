@@ -55,18 +55,27 @@ for std in [.5,1,1.5]:
 ## Analysis
 
 ```python
-def get_eculidean_distance(point,k):
-  euc_distance = np.sqrt(np.sum((X_train - point)**2 , axis=1))
-  return np.argsort(euc_distance)[0:k]
+def get_knn(X,point,k,distance='euclidean'):
+  """ 
+  Returns the indices of `k` nearest neighbors to `point` in `X`
+
+  >>> get_knn(np.array([(1,1)]),(1,1),1)
+  array([0])
+  >>> get_knn(np.array([(1,2),(1,1)]),(1,1),1)
+  array([1])
+  >>> get_knn(np.array([(1,4),(1,1),(1,3),(1,1.5)]),(1,1),2)
+  array([1, 3])
+  """
+  if distance == 'euclidean':
+    nn = np.sqrt(np.sum((X - point)**2, axis=1))
+  return np.argsort(nn)[0:k]
 
 def predict(prediction_points,k):
   points_labels=[]
   
   for point in prediction_points:
-    distances=get_eculidean_distance(point,k)
-    
     results=[]
-    for index in distances:
+    for index in get_knn(X_train,point,k):
       results.append(y_train[index])
     
     label=Counter(results).most_common(1)
