@@ -73,7 +73,7 @@ def get_knn(X,point,k,distance='euclidean'):
   if distance == 'euclidean':
     distances = np.sqrt(np.sum((X - point)**2, axis=1))
   else:
-    distances = np.sum(X - point, axis=1)
+    distances = np.sum(np.abs(X - point), axis=1)
   return np.argsort(distances)[0:k]
 
 def predict(prediction_points,k,distance='euclidean'):
@@ -105,7 +105,7 @@ def plot_accuracy(distance):
 
 ```python
 for std in [.5,1,1.5]:
-  for n in [50,100,150,1500]:
+  for n in [50,100,150]:
     (X_train, y_train, X_validation, y_validation) = gen_data(n,std)
 
     plot_accuracy('euclidean')
