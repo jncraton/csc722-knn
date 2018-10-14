@@ -2,6 +2,8 @@
 % Jon Craton
 % November 9th, 2018
 
+# Initialization
+
 ```python
 from sklearn.datasets.samples_generator import make_blobs
 import numpy as np
@@ -13,42 +15,44 @@ sns.set(style="darkgrid")
 np.random.seed(6)
 import math
 from collections import Counter
+```
 
-Num_smaples = 100
-Num_smaples_training = int(.9*Num_smaples)
+# Data Generation
 
-(X,y) =  make_blobs(n_samples=Num_smaples,n_features=2,centers=2,cluster_std=1.95,random_state=50)
-X_train = X[0: Num_smaples_training]
-y_train = y[0:Num_smaples_training]
+I've created a function out of the example code to generate multiple scatter plots easily:
 
+```python
+def gen_data(n, cluster_std, plot=True):
+  n_training = int(.9*n)
 
-X_validation = X[Num_smaples_training:]
-y_validation = y[Num_smaples_training:]
+  (X,y) =  make_blobs(n_samples=n,n_features=2,centers=2,cluster_std=cluster_std,random_state=50)
 
-len(X_validation)
+  if plot:
+    plt.scatter(X[0: n_training][:,0],X[0:n_training][:,1],marker='o',c=y[0:n_training])
+    plt.scatter(np.array(X[n_training:])[:,0],np.array(X[n_training:])[:,1],marker='o')
+    plt.title("n=%d, std=%.01f" % (n, cluster_std))
+    plt.show()  
+
+  return (X[0:n_training],
+          y[0:n_training],
+          X[n_training:],
+          y[n_training:]
+         )
+```
+
+Let's use this to create the requested plots:
+
+```python
+for std in [.5,1,1.5]:
+  for n in [50,100,150]:
+    gen_data(n, std)
 ```
 
 ```python
-X
+(X_train, y_train, X_validation, y_validation) = gen_data(100, 1.95)
 ```
 
-```python
-y
-```
-
-```python
-plt.scatter(X_train[:,0],X_train[:,1],marker='o',c=y_train)
-plt.show()
-```
-
-```python
-prediction_points = X_validation
-prediction_points = np.array(prediction_points)
-
-plt.scatter(X_train[:,0],X_train[:,1],marker='o',c=y_train)
-plt.scatter(prediction_points[:,0],prediction_points[:,1],marker='o')
-plt.show()
-```
+## Analysis
 
 ```python
 def get_eculidean_distance(point,k):
@@ -63,7 +67,7 @@ def predict(prediction_points,k):
     
     results=[]
     for index in distances:
-        results.append(y[index])
+      results.append(y_train[index])
     
     label=Counter(results).most_common(1)
     points_labels.append([point,label[0][0]])
