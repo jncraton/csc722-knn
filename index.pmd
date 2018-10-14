@@ -1,3 +1,96 @@
-% Title
-% Author
-% August 5th, 2018
+% KNN Project
+% Jon Craton
+% November 9th, 2018
+
+```python
+from sklearn.datasets.samples_generator import make_blobs
+import numpy as np
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+sns.set(style="darkgrid")
+
+np.random.seed(6)
+import math
+from collections import Counter
+
+Num_smaples = 100
+Num_smaples_training = int(.9*Num_smaples)
+
+(X,y) =  make_blobs(n_samples=Num_smaples,n_features=2,centers=2,cluster_std=1.95,random_state=50)
+X_train = X[0: Num_smaples_training]
+y_train = y[0:Num_smaples_training]
+
+
+X_validation = X[Num_smaples_training:]
+y_validation = y[Num_smaples_training:]
+
+len(X_validation)
+```
+
+```python
+X
+```
+
+```python
+y
+```
+
+```python
+plt.scatter(X_train[:,0],X_train[:,1],marker='o',c=y_train)
+plt.show()
+```
+
+```python
+prediction_points = X_validation
+prediction_points = np.array(prediction_points)
+
+plt.scatter(X_train[:,0],X_train[:,1],marker='o',c=y_train)
+plt.scatter(prediction_points[:,0],prediction_points[:,1],marker='o')
+plt.show()
+```
+
+```python
+def get_eculidean_distance(point,k):
+  euc_distance = np.sqrt(np.sum((X_train - point)**2 , axis=1))
+  return np.argsort(euc_distance)[0:k]
+
+def predict(prediction_points,k):
+  points_labels=[]
+  
+  for point in prediction_points:
+    distances=get_eculidean_distance(point,k)
+    
+    results=[]
+    for index in distances:
+        results.append(y[index])
+    
+    label=Counter(results).most_common(1)
+    points_labels.append([point,label[0][0]])
+      
+  return points_labels
+
+def get_accuracy(predictions):
+    error=np.sum((predictions-y_validation)**2)
+    accuracy=100-(error/len(y_validation))*100
+    return accuracy
+
+acc=[]
+for k in range(1,10):
+    results=predict(X_validation,k)
+    predictions=[]
+    for result in results:
+        predictions.append(result[1])
+    acc.append([get_accuracy(predictions),k])
+
+plotx=[]
+ploty=[]
+for a in acc:
+    plotx.append(a[1])
+    ploty.append(a[0])
+    
+plt.plot(plotx,ploty)
+plt.xlabel("k values")
+plt.ylabel("accuracy")
+plt.show()
+```
