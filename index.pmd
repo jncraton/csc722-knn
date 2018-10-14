@@ -105,7 +105,7 @@ def plot_accuracy(distance):
 
 ```python
 for std in [.5,1,1.5]:
-  for n in [50,100,150]:
+  for n in [50,100,150,1500]:
     (X_train, y_train, X_validation, y_validation) = gen_data(n,std)
 
     plot_accuracy('euclidean')
