@@ -117,8 +117,8 @@ def plot_accuracy(dist):
 # Prediction Accuracy
 
 ```python
-for std in [.5,1,1.5]:
-  for n in [50,100,150]:
+for std in [.5,1,1.5,3.0]:
+  for n in [50,100,150,500]:
     (
       X_train, y_train, 
       X_val, y_val
