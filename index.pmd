@@ -136,6 +136,6 @@ for std in [.5,1,1.5,3.0]:
 The above plots show us the following:
 
 1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor.
-2. Larger K is generally better. It removes a certain luck factor.
-  - This wasn't quite true on the n=100 and std=1.50 plot due to some tricky validation points.
-3. Euclidean and Manhattan distance largely perform the same function. There was only one instance in all trials where Manhattan performed differently than Euclidean.
+2. Larger K is generally better.
+  - This wasn't quite true on the n=100 and std=1.50 plot due to some tricky validation points, but it is a very clear on the more challenging classifications (σ=3.0).
+3. Euclidean and Manhattan distance largely perform the same function for this data. It appeared to basically be a wash between the two.
