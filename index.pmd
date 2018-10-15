@@ -121,3 +121,12 @@ for std in [.5,1,1.5]:
     plt.ylabel("Accuracy")
     plt.show()
 ```
+
+# Conclusions
+
+The above plots show us the following:
+
+1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor.
+2. Larger K is generally better. It removes a certain luck factor.
+  - This wasn't quite true on the n=100 and std=1.50 plot due to some tricky validation points.
+3. Euclidean and Manhattan distance largely perform the same function.
