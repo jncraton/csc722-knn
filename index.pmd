@@ -36,11 +36,21 @@ def gen_data(n, cluster_std, plot=True):
     plt.title("n=%d, std=%.02f" % (n, cluster_std))
     plt.show()
 
-  return (X[:n_training],
+  return (
+          X[:n_training],
           y[:n_training],
           X[n_training:],
           y[n_training:]
          )
+```
+
+Here's the original data from the sample notebook:
+
+```python
+(
+  X_train, y_train, 
+  X_val, y_val
+) = gen_data(100, 1.95)
 ```
 
 # Data Plots
@@ -51,10 +61,6 @@ Let's use this to create the requested plots:
 for std in [.5,1,1.5]:
   for n in [50,100,150]:
     gen_data(n, std)
-```
-
-```python
-(X_train, y_train, X_validation, y_validation) = gen_data(100, 1.95)
 ```
 
 # Prediction Code
@@ -95,14 +101,14 @@ def predict(prediction_points,k,distance='euclidean'):
   return points_labels
 
 def get_accuracy(predictions):
-  error=np.sum((predictions-y_validation)**2)
-  accuracy=100-(error/len(y_validation))*100
+  error=np.sum((predictions-y_val)**2)
+  accuracy=100-(error/len(y_val))*100
   return accuracy
 
-def plot_accuracy(distance):
+def plot_accuracy(dist):
   acc=[]
   for k in range(1,21):
-    predictions=[r[1] for r in predict(X_validation,k,distance=distance)]
+    predictions=[r[1] for r in predict(X_val,k,distance=dist)]
     acc.append([get_accuracy(predictions),k])
   
   plt.plot([a[1] for a in acc], [a[0] for a in acc])
@@ -113,7 +119,10 @@ def plot_accuracy(distance):
 ```python
 for std in [.5,1,1.5]:
   for n in [50,100,150]:
-    (X_train, y_train, X_validation, y_validation) = gen_data(n,std)
+    (
+      X_train, y_train, 
+      X_val, y_val
+    ) = gen_data(n,std)
 
     plot_accuracy('euclidean')
     plot_accuracy('manhattan')
@@ -129,4 +138,4 @@ The above plots show us the following:
 1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor.
 2. Larger K is generally better. It removes a certain luck factor.
   - This wasn't quite true on the n=100 and std=1.50 plot due to some tricky validation points.
-3. Euclidean and Manhattan distance largely perform the same function.
+3. Euclidean and Manhattan distance largely perform the same function. There was only one instance in all trials where Manhattan performed differently than Euclidean.
