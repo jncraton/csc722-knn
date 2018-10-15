@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 import seaborn as sns
 sns.set(style="darkgrid")
+sns.set_context("paper")
 
 np.random.seed(6)
 import math
@@ -28,17 +29,21 @@ def gen_data(n, cluster_std, plot=True):
   (X,y) =  make_blobs(n_samples=n,n_features=2,centers=2,cluster_std=cluster_std,random_state=50)
 
   if plot:
-    plt.scatter(X[0: n_training][:,0],X[0:n_training][:,1],marker='o',c=y[0:n_training])
-    plt.scatter(np.array(X[n_training:])[:,0],np.array(X[n_training:])[:,1],marker='o')
+    colors = ['tab:red','tab:blue','tab:green','tab:orange']
+    c = [colors[c] for c in np.concatenate((y[:n_training], np.add(2,y[n_training:])))]
+    sns.set_palette("husl")
+    plt.scatter(X[:,0],X[:,1],c=c)
     plt.title("n=%d, std=%.02f" % (n, cluster_std))
-    plt.show()  
+    plt.show()
 
-  return (X[0:n_training],
-          y[0:n_training],
+  return (X[:n_training],
+          y[:n_training],
           X[n_training:],
           y[n_training:]
          )
 ```
+
+# Data Plots
 
 Let's use this to create the requested plots:
 
@@ -52,7 +57,7 @@ for std in [.5,1,1.5]:
 (X_train, y_train, X_validation, y_validation) = gen_data(100, 1.95)
 ```
 
-## Analysis
+# Prediction Code
 
 ```python
 def get_knn(X,point,k,distance='euclidean'):
@@ -102,6 +107,8 @@ def plot_accuracy(distance):
   
   plt.plot([a[1] for a in acc], [a[0] for a in acc])
 ```
+
+# Prediction Accuracy
 
 ```python
 for std in [.5,1,1.5]:
