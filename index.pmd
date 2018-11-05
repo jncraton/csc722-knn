@@ -2,37 +2,53 @@
 % Jon Craton
 % November 9th, 2018
 
-# Anaconda Installation
+1. Anaconda Installation
+========================
 
-Following the instructions available here Anaconda can be installed on my system:
+> Install Anaconda from (https://www.anaconda.com/download/) and run the code that I have provided. Installing Anaconda and being able to work with it is part of project.  
 
-http://docs.continuum.io/anaconda/install/linux/
+Following the [instructions](http://docs.continuum.io/anaconda/install/linux/) Anaconda can be installed on my system. I walked through this and have installed Anaconda several times.
 
-I walked through this and have installed Anaconda several times.
+![](media/anaconda-install-start.png)
 
-# Initialization
+…
+
+![](media/anaconda-install-complete.png)
+
+2. Plots 
+========
+
+> Please plot the training points in section (a) for the following sets and explain your observation. If you could not save the figures from Anaconda, you can use PrintScreen  to add the plots/figures to your report but I would recommend finding the command line that you can save the figures from Anaconda. 
+
+Initialization
+--------------
 
 I've restructured much of the code from the original IPython notebook here.
 
-I've also chosen to use [pweave](http://mpastell.com/pweave/) to generate my final output. pweave uses IPython to execute chunks of code found in a text file. This allows me to execute the code from the notebook in a repeatable way that can also be included in a clean final PDF output.
+I've chosen to use [pweave](http://mpastell.com/pweave/) to generate my final output. pweave uses IPython to execute chunks of code found in a text file. This allows me to execute the code from the notebook in a repeatable way that can also be included in a clean final PDF output.
 
-Let's pull in the initialization code. I've also included Seaborn, as I think the default matplotlib plots don't look great.
+Let's pull in our imports and set a standard seed for the RNG.
 
 ```python
 from sklearn.datasets.samples_generator import make_blobs
 import numpy as np
-import matplotlib.pyplot as plt
+np.random.seed(6)
 
+from collections import Counter
+
+import matplotlib.pyplot as plt
+```
+
+Let's also include Seaborn to make things look a little nicer.
+
+```python
 import seaborn as sns
 sns.set(style="darkgrid")
 sns.set_context("paper")
-
-np.random.seed(6)
-import math
-from collections import Counter
 ```
 
-# Data Generation
+Generation
+----------
 
 I've created a function out of the example code to generate multiple scatter plots easily:
 
@@ -47,7 +63,7 @@ def gen_data(n, cluster_std, plot=True, features=2):
     c = [colors[c] for c in np.concatenate((y[:n_training], np.add(2,y[n_training:])))]
     sns.set_palette("husl")
     plt.scatter(X[:,0],X[:,1],c=c)
-    plt.title("n=%d, std=%.02f" % (n, cluster_std))
+    plt.title("n=%d, σ=%.01f" % (n, cluster_std))
     plt.show()
 
   return (
@@ -67,7 +83,8 @@ Here's the original data from the sample notebook:
 ) = gen_data(100, 1.95)
 ```
 
-# Data Plots
+Plots
+-----
 
 Let's use this to create the requested plots:
 
@@ -77,7 +94,20 @@ for std in [.5,1,1.5]:
     gen_data(n, std)
 ```
 
-# Prediction Code
+3. Manhattan Distance
+=====================
+
+> Modify the code in section (c) to calculate the Manhattan distance.
+
+Here's our orginal distance function:
+
+```python
+def get_eculidean_distance(point,k):
+  euc_distance = np.sqrt(np.sum((X_train - point)**2 , axis=1))
+  return np.argsort(euc_distance)[0:k]
+```
+
+Let's create a new function that can take distance a parameter and return k nearest neighbors using either Euclidean or Manhattan distance. We'll use `np.sum(np.abs(X - point), axis=1)` to calculate Manhattan distance.
 
 ```python
 def get_knn(X,point,k,distance='euclidean'):
@@ -100,7 +130,19 @@ def get_knn(X,point,k,distance='euclidean'):
   else:
     distances = np.sum(np.abs(X - point), axis=1)
   return np.argsort(distances)[0:k]
+```
 
+4. Impact of k
+==============
+
+> Change K from 1 – 20 and plot the accuracy for both Euclidian and Manhattan distances. Explain what you have observed. 
+
+Prediction
+----------
+
+First, we'll need some code to return actual predictions. The prediction returned by KNN is simply the most common class of the k nearest neighbors.
+
+```python
 def predict(prediction_points,k,distance='euclidean'):
   points_labels=[]
   
@@ -113,15 +155,26 @@ def predict(prediction_points,k,distance='euclidean'):
     points_labels.append([point,label[0][0]])
       
   return points_labels
+```
 
+Next, we'll add a measure of accuracy. This is simply the number of correct predictions over the number of attempts.
+
+```python
 def get_accuracy(predictions):
   error=np.sum((predictions-y_val)**2)
   accuracy=100-(error/len(y_val))*100
   return accuracy
+```
 
-def plot_accuracy(dist,k=20):
+Sweeping k
+----------
+
+Let's now create a function to sweep through K values and plot accuracy against them.
+
+```python
+def plot_accuracy(dist,k_max=20):
   acc=[]
-  for k in range(1,k+1,int(k/20)):
+  for k in range(1,k_max+1,int(k_max/20)):
     predictions=[r[1] for r in predict(X_val,k,distance=dist)]
     acc.append([get_accuracy(predictions),k])
   
@@ -129,11 +182,11 @@ def plot_accuracy(dist,k=20):
   plt.legend()
 ```
 
-# Prediction Accuracy
+Now let's sweep through different values of K on our different data sets and explore the results.
 
 ```python
-for std in [.5,1,1.5,3.0]:
-  for n in [50,100,150,500]:
+for std in [.5,1,1.5]:
+  for n in [50,100,150]:
     (
       X_train, y_train, 
       X_val, y_val
@@ -143,19 +196,40 @@ for std in [.5,1,1.5,3.0]:
     plot_accuracy('manhattan')
     plt.xlabel("Neighbors")
     plt.ylabel("Accuracy")
+    plt.title("Accuracy of n=%d and σ=%.01f" % (n,std))
     plt.show()
 ```
 
-# Conclusions
+I'm not entirely satisfied with those results, so let's add some samples with larger n and larger σ to see if this provides more interesting accuracy.
+
+```python
+for std in [3.0,10.0]:
+  for n in [150,500]:
+    (
+      X_train, y_train, 
+      X_val, y_val
+    ) = gen_data(n,std)
+
+    plot_accuracy('euclidean')
+    plot_accuracy('manhattan')
+    plt.xlabel("Neighbors")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy of n=%d and σ=%.01f" % (n,std))
+    plt.show()
+```
+
+Conclusions
+-----------
 
 The above plots show us the following:
 
 1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor.
 2. Larger K is generally better.
-  - This wasn't quite true on the n=100 and std=1.50 plot due to some tricky validation points, but it is a very clear on the more challenging classifications (σ=3.0).
 3. Euclidean and Manhattan distance largely perform the same function for this data. It appeared to basically be a wash between the two.
+4. As expected, the more overlap we see between datasets, the harder it is to accurately classify data.
 
-# Dimensionality
+Additional Exploration
+======================
 
 These conclusions are somewhat unsatisfying, so let's try increasing our number of features to explore the real difference between these distance algorithms.
 
@@ -164,10 +238,10 @@ for std in [10.0,20.0,50.0]:
   (
     X_train, y_train, 
     X_val, y_val
-  ) = gen_data(100,std,plot=False,features=20)
+  ) = gen_data(100,std,plot=False,features=500)
 
-  plot_accuracy('euclidean',k=40)
-  plot_accuracy('manhattan',k=40)
+  plot_accuracy('euclidean',k_max=40)
+  plot_accuracy('manhattan',k_max=40)
   plt.xlabel("Neighbors")
   plt.ylabel("Accuracy")
   plt.show()
