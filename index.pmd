@@ -206,7 +206,7 @@ for std in [.5,1,1.5]:
 I'm not entirely satisfied with those results, so let's add some samples with larger n and larger σ to see if this provides more interesting accuracy.
 
 ```python
-for std in [3.0,10.0]:
+for std in [3.0]:
   for n in [150,500]:
     (
       X_train, y_train, 
@@ -229,25 +229,32 @@ The above plots show us the following:
 Additional Exploration
 ======================
 
-These conclusions are somewhat unsatisfying, so let's try increasing our number of features to explore the real difference between these distance algorithms.
+I was a little disappointed to find no real difference between Manhattan and Euclidean distance. 
+
+I did a little [additional searching](https://stats.stackexchange.com/questions/99171/why-is-euclidean-distance-not-a-good-metric-in-high-dimensions), and found that differences between these distance functions may show up in [higher dimensions](https://en.wikipedia.org/wiki/Curse_of_dimensionality#Distance_functions).
+Let's try generating some higher-dimensional data and see if we can find a difference between the distance formulas.
+
+I'll create a custom data set consisting of 200 variables. The data will be split into two classes. Only the first 2 variables will be related to the class, with the remaining variables being random noise. We'll then plot the comparative accuracy of our two distance functions.
 
 ```python
 from random import random
 
-for std in [.5,1.0,1.5]:
-  for f in [200]:
-    (
-      X_train, y_train, 
-      X_val, y_val
-    ) = gen_data(n,std,features=f)
+n = 500
+f = 200
+std = .5
 
-    for X in X_train:
-      for i in range(0,f-2):
-        X[i] = 15*(random()-.5)
-        
-    for X in X_val:
-      for i in range(0,f-2):
-        X[i] = 15*(random()-.5)
+for run in range(0,3): # Run a few times for consistency
+  y = [int(i % 2) for i in range(0,n)]
 
-    plot_comparative_accuracy(n,std,k_max=100)
+  X = [[2*random()-1 + (2*y[i]-1),2*random()-1 + (2*y[i]-1)] + [5*(random()-.5) for j in range(0,f-2)] for i in range(0,n)]
+
+  X_train = np.array(X[:int(f*.9)])
+  y_train = np.array(y[:int(f*.9)])
+  X_val = np.array(X[int(f*.9):])
+  y_val = np.array(y[int(f*.9):])
+
+  plot_comparative_accuracy(n,std,k_max=100)
 ```
+
+We can see that in this higher-dimensional dataset, Manhattan distance works out much better for us for all values of k.
+
