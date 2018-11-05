@@ -221,10 +221,9 @@ Conclusions
 
 The above plots show us the following:
 
-1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor.
+1. Tightly clustered data is very easy to predict with perfect accuracy using KNN, even by simply looking at one nearest neighbor. As expected, the more overlap we see between datasets, the harder it is to accurately classify data.
 2. Larger K is generally better.
 3. Euclidean and Manhattan distance largely perform the same function for this data. It appeared to basically be a wash between the two.
-4. As expected, the more overlap we see between datasets, the harder it is to accurately classify data.
 
 Additional Exploration
 ======================
