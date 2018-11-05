@@ -2,7 +2,21 @@
 % Jon Craton
 % November 9th, 2018
 
+# Anaconda Installation
+
+Following the instructions available here Anaconda can be installed on my system:
+
+http://docs.continuum.io/anaconda/install/linux/
+
+I walked through this and have installed Anaconda several times.
+
 # Initialization
+
+I've restructured much of the code from the original IPython notebook here.
+
+I've also chosen to use [pweave](http://mpastell.com/pweave/) to generate my final output. pweave uses IPython to execute chunks of code found in a text file. This allows me to execute the code from the notebook in a repeatable way that can also be included in a clean final PDF output.
+
+Let's pull in the initialization code. I've also included Seaborn, as I think the default matplotlib plots don't look great.
 
 ```python
 from sklearn.datasets.samples_generator import make_blobs
@@ -152,8 +166,8 @@ for std in [10.0,20.0,50.0]:
     X_val, y_val
   ) = gen_data(100,std,plot=False,features=20)
 
-  plot_accuracy('euclidean',k=20)
-  plot_accuracy('manhattan',k=20)
+  plot_accuracy('euclidean',k=40)
+  plot_accuracy('manhattan',k=40)
   plt.xlabel("Neighbors")
   plt.ylabel("Accuracy")
   plt.show()
