@@ -180,6 +180,14 @@ def plot_accuracy(dist,k_max=20):
   
   plt.plot([a[1] for a in acc], [a[0] for a in acc], label=dist)
   plt.legend()
+
+def plot_comparative_accuracy(n,std,k_max=20):
+  plot_accuracy('euclidean',k_max=k_max)
+  plot_accuracy('manhattan',k_max=k_max)
+  plt.xlabel("Neighbors")
+  plt.ylabel("Accuracy")
+  plt.title("Accuracy of n=%d and σ=%.01f" % (n,std))
+  plt.show()
 ```
 
 Now let's sweep through different values of K on our different data sets and explore the results.
@@ -192,12 +200,7 @@ for std in [.5,1,1.5]:
       X_val, y_val
     ) = gen_data(n,std)
 
-    plot_accuracy('euclidean')
-    plot_accuracy('manhattan')
-    plt.xlabel("Neighbors")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy of n=%d and σ=%.01f" % (n,std))
-    plt.show()
+    plot_comparative_accuracy(n,std)
 ```
 
 I'm not entirely satisfied with those results, so let's add some samples with larger n and larger σ to see if this provides more interesting accuracy.
@@ -210,12 +213,7 @@ for std in [3.0,10.0]:
       X_val, y_val
     ) = gen_data(n,std)
 
-    plot_accuracy('euclidean')
-    plot_accuracy('manhattan')
-    plt.xlabel("Neighbors")
-    plt.ylabel("Accuracy")
-    plt.title("Accuracy of n=%d and σ=%.01f" % (n,std))
-    plt.show()
+    plot_comparative_accuracy(n,std)
 ```
 
 Conclusions
@@ -234,15 +232,22 @@ Additional Exploration
 These conclusions are somewhat unsatisfying, so let's try increasing our number of features to explore the real difference between these distance algorithms.
 
 ```python
-for std in [10.0,20.0,50.0]:
-  (
-    X_train, y_train, 
-    X_val, y_val
-  ) = gen_data(100,std,plot=False,features=500)
+from random import random
 
-  plot_accuracy('euclidean',k_max=40)
-  plot_accuracy('manhattan',k_max=40)
-  plt.xlabel("Neighbors")
-  plt.ylabel("Accuracy")
-  plt.show()
+for std in [.5,1.0,1.5]:
+  for f in [200]:
+    (
+      X_train, y_train, 
+      X_val, y_val
+    ) = gen_data(n,std,features=f)
+
+    for X in X_train:
+      for i in range(0,f-2):
+        X[i] = 15*(random()-.5)
+        
+    for X in X_val:
+      for i in range(0,f-2):
+        X[i] = 15*(random()-.5)
+
+    plot_comparative_accuracy(n,std,k_max=100)
 ```
