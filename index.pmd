@@ -94,6 +94,12 @@ for std in [.5,1,1.5]:
     gen_data(n, std)
 ```
 
+Observations
+------------
+
+We observe that increasing `n` increases the number of samples. Increasing `σ` causes our data points to be less tightly clustered.
+
+
 3. Manhattan Distance
 =====================
 
